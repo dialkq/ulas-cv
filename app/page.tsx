@@ -1,91 +1,60 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
+import axios from "axios";
 
-export default function Home() {
-  const [image, setImage] = useState<string>("");
-  const [openAIResponse, setOpenAIResponse] = useState<string>("");
+const Page = () => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [review, setReview] = useState<string>("");
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-  };
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files === null) {
-      return <p>File not found</p>;
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedFile(event.target.files[0]);
     }
-    const file = event.target.files?.[0];
+  };
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!selectedFile) {
+      alert("Please upload a file first.");
+      return;
+    }
 
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        console.log(reader.result);
-        setImage(reader.result);
-      }
-    };
+    const formData = new FormData();
+    formData.append("file", selectedFile);
 
-    reader.onerror = (error) => {
-      console.log(error);
-    };
+    try {
+      const response = await axios.post("/api/ulascv", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setReview(response.data.review);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
   };
 
   return (
-    <div className="w-full flex flex-col md:flex-row md:px-5">
-      {/* KOMPONEN UPLOAD */}
-      <div className="w-[90%] md:w-[35%] flex flex-col my-5 mx-auto justify-center bg-white rounded-xl shadow-md animate-fadeIn">
-        <p className="font-bold text-center my-8 text-xl font-sans text-slate-950">
-          Ayo Ulas CV Kamu!
-        </p>
-
-        {/* SHOW IMAGE */}
-        {image !== "" ? (
-          <div className="w-full h-40 overflow-hidden">
-            <Image
-              src={image}
-              width={300}
-              height={300}
-              alt="CV"
-              className="mx-auto object-contain"
-            />
-          </div>
-        ) : (
-          <div className="flex mx-auto">
-            <p>Hasil Upload CV / Resume</p>
-          </div>
-        )}
-
-        {/* Form */}
-        <form className="w-[85%] mx-auto" onSubmit={handleSubmit}>
-          <div className="flex flex-col mt-3">
-            <label className="text-sm font-sans font-bold mb-2 text-slate-800">
-              CV / Resume
-            </label>
-            <input
-              type="file"
-              name="file"
-              className="border text-sm border-black rounded-md cursor-pointer"
-              required
-              onChange={(e) => handleFileChange(e)}
-            />
-          </div>
-
-          <div className="flex w-28 md:w-32 my-4 bg-slate-800 hover:bg-slate-900 text-white rounded-xl transition-all duration-300 ease-in-out">
-            <button
-              type="submit"
-              className="text-center mx-auto font-semibold text-xs md:text-sm p-2 md:p-2.5"
-            >
-              Ulas Sekarang
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* BUBLE CHATGPT */}
-      <div className="w-11/12 md:w-[60%] lg:w-[62%] md:my-5 mx-auto bg-white rounded-lg">
-        <p className="w-11/12 text-center">Hasil Ulas</p>
-      </div>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">AI CV Review</h1>
+      <form onSubmit={handleSubmit} className="mb-4">
+        <input type="file" onChange={handleFileChange} className="mb-2" />
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          Upload and Review
+        </button>
+      </form>
+      {review && (
+        <div className="mt-4 p-4 bg-gray-100 rounded">
+          <h2 className="text-xl font-semibold mb-2">CV Review:</h2>
+          <p>{review}</p>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default Page;
