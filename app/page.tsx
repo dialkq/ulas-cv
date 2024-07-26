@@ -37,7 +37,7 @@ const Page = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">AI CV Review</h1>
+      <h1 className="text-2xl font-bold mb-4">AI CV Review:</h1>
       <form onSubmit={handleSubmit} className="mb-4">
         <input type="file" onChange={handleFileChange} className="mb-2" />
         <button
