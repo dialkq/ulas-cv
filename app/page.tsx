@@ -49,7 +49,7 @@ const Page = () => {
       </form>
       {review && (
         <div className="mt-4 p-4 bg-gray-100 rounded">
-          <h2 className="text-xl font-semibold mb-2">CV Review:</h2>
+          <h2 className="text-xl font-semibold mb-2">CV Review</h2>
           <p>{review}</p>
         </div>
       )}
