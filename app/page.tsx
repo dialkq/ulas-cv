@@ -44,7 +44,7 @@ const Page = () => {
           type="submit"
           className="px-4 py-2 bg-blue-500 text-white rounded"
         >
-          Upload and Reviews CV
+          Upload and Reviews
         </button>
       </form>
       {review && (
